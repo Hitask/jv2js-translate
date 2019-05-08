@@ -19,6 +19,7 @@
 		"url": "https://github.com/HiTask/jv2js-translate/issues"
 	},
 	"scripts": {
+		"eslint": "eslint .",
 		"test:cli:nested": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist",
 		"test:cli:flatten": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist --flatten true",
 		"test:node:nested": "rm -rf test/dist && node test/node-api.nested.test.js",
@@ -32,6 +33,12 @@
 		"yargs": "^13.0.0"
 	},
 	"devDependencies": {
+		"eslint": "^5.0.0",
+		"eslint-config-airbnb": "^17.0.0",
+		"eslint-config-prettier": "^4.0.0",
+		"eslint-plugin-import": "^2.0.0",
+		"eslint-plugin-jsx-a11y": "^6.0.0",
+		"eslint-plugin-react": "^7.0.0",
 		"prettier": "^1.17.0"
 	}
 }

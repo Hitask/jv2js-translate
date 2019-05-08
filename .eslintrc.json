@@ -1,0 +1,38 @@
+{
+	"extends": ["airbnb", "prettier"],
+	"env": {
+		"node": true
+	},
+	"rules": {
+		"semi" : 0,
+		"max-len": 0,
+		"indent": 0,
+		"no-param-reassign": [2, {"props": false}],
+		"no-console": ["warn", {
+			"allow": ["warn", "error"]
+		}],
+		"comma-dangle": 0,
+		"no-nested-ternary": 0,
+		"no-tabs": 0,
+		"no-uderscore-dangling": 0,
+		"new-cap": 0,
+		"no-underscore-dangle": 0,
+		"prefer-destructuring": 0,
+		"no-unused-vars": 1,
+		"no-else-return": 1,
+		"arrow-body-style": 0,
+		"class-methods-use-this": 0,
+		"global-require": 1,
+		"no-plusplus": 1,
+		"newline-per-chained-call": 1,
+		"space-infix-ops": 1,
+		"import/extensions": {
+			".js": "never",
+			".json": "always",
+			".scss": "always"
+		},
+		"import/named": 2,
+		"import/no-extraneous-dependencies": 0,
+		"import/no-duplicates": 0
+	}
+}
