@@ -14,8 +14,11 @@
 	"license": "UNLICENSED",
 	"bin": {
 		"jv2js-translate": "./bin/jv2js-translate"
-	},
-	"devDependencies": {
+  },
+  "bugs": {
+    "url": "https://github.com/HiTask/jv2js-translate/issues"
+  },
+	"dependencies": {
 	  "colors": "^1.2.1",
 	  "glob": "^7.1.1",
 	  "lodash.merge": "^4.0.0",

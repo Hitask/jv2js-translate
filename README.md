@@ -4,23 +4,26 @@ Tools for converting translations from java properties to JSON format.
 Example:
 
 Source file `en/main.properties`
+
 ```java
 login.password=Password
 ```
+
 will be compiled to `en.json`
+
 ```json
 "main": {
-	"login": {
-		"password": "Password"
-	}
+  "login": {
+    "password": "Password"
+  }
 }
 ```
 
-### API
+## API
 
-##### Executable name: `jv2js-translate`
+### CLI usage - Executable name: `jv2js-translate`
 
-##### Command `compile`
+#### Command `compile`
 
 Options:
 * src, s - relative or absolute path to folder with source locales directories. That folder should contain directories with `.properties` files. Folder name should math language name. Folder should exist. Required option
@@ -28,3 +31,11 @@ Options:
 * default, f - default locale (must match one of locales folders name). Default value: `en`
 
 Example: `jv2js-translate compile -s ./languages -d ./public/app/json-locales`
+
+### NodeJs usage
+
+```
+const { compileLocales } = require('@hitask/jv2js-translate');
+
+compileLocales({ src: './src', dist: './dist' });
+```
