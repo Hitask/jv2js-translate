@@ -72,21 +72,27 @@ const dots2keys = (obj, localeName) => {
 	});
 };
 
-const parseLanguagesFromDir = ({ localeName, langDir }) => {
-	const allLocalesObject = {};
-	glob.sync('*.properties', { cwd: path.join(langDir, localeName), realpath: true }).forEach(
-		propertiesFilename => {
+const parseLocaleFromDir = ({ localeName, langDir, flatten }) => {
+	const localeObject = glob
+		.sync('*.properties', { cwd: path.join(langDir, localeName), realpath: true })
+		.reduce((acc, propertiesFilename) => {
 			const namespace = /([^/\\]+).properties$/.exec(propertiesFilename)[1]; // extract filename without extension
 			const objectOfLocalizedMessages = read(propertiesFilename);
-			dots2keys(objectOfLocalizedMessages, localeName);
-			allLocalesObject[namespace] = objectOfLocalizedMessages;
-		}
-	);
-	return allLocalesObject;
+			if (flatten) {
+				Object.keys(objectOfLocalizedMessages).forEach(key => {
+					acc[`${namespace}.${key}`] = objectOfLocalizedMessages[key];
+				});
+			} else {
+				dots2keys(objectOfLocalizedMessages, localeName);
+				acc[namespace] = objectOfLocalizedMessages;
+			}
+			return acc;
+		}, {});
+	return localeObject;
 };
 
 const props2Json = argv => {
-	const { src: langDir, dist: destinationDir, default: defaultLocale } = argv;
+	const { src: langDir, dist: destinationDir, default: defaultLocale, flatten } = argv;
 	// console.log('Start parsing locales props files to Json');
 	const locales = parseAccessibleLocales(langDir);
 	if (!locales.length) return;
@@ -96,19 +102,16 @@ const props2Json = argv => {
 		fs.unlinkSync(path.join(destinationDir, localeName));
 	});
 
-	const defaultLocalesObj = parseLanguagesFromDir({ localeName: defaultLocale, langDir });
+	const defaultLocaleObj = parseLocaleFromDir({ localeName: defaultLocale, langDir, flatten });
 
 	// Generated needed locales
 	locales.forEach(localeName => {
 		// console.log(`Start parsing locale: ${localeName}`);
-		const localesObject = parseLanguagesFromDir({ localeName, langDir });
-		const localeObjectWithDefaultsApplied = merge({}, defaultLocalesObj, localesObject);
+		const localeObject = parseLocaleFromDir({ localeName, langDir, flatten });
+		const localeObjectWithDefaultsApplied = merge({}, defaultLocaleObj, localeObject);
 		const destFile = path.join(destinationDir, `${localeName}.json`);
-		fs.writeFileSync(
-			destFile,
-			JSON.stringify(localeObjectWithDefaultsApplied, null, 4),
-			'utf-8'
-		);
+		const destContent = JSON.stringify(localeObjectWithDefaultsApplied, null, 4);
+		fs.writeFileSync(destFile, destContent, 'utf-8');
 		console.log(`${localeName} locale file was successfully written`.green);
 	});
 

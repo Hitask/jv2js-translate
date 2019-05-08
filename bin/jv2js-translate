@@ -27,6 +27,11 @@ yargs
 				default: 'en',
 				describe: 'default locale',
 			},
+			flatten: {
+				alias: 'l',
+				default: false,
+				describe: 'translation keys are flatten, joined by "."'
+			}
 		},
 		argv => {
 			const args = checkRelativePathArgs(argv, ['src', 's', 'dist', 'd']);
