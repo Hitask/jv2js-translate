@@ -17,7 +17,11 @@
   },
   "bugs": {
     "url": "https://github.com/HiTask/jv2js-translate/issues"
-  },
+	},
+	"scripts": {
+		"test:cli": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist",
+		"test:node": "rm -rf test/dist && node test/node-api.test.js"
+	},
 	"dependencies": {
 	  "colors": "^1.2.1",
 	  "glob": "^7.1.1",
