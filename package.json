@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"author": "Human Computer LLC",
 	"repository": {
-	  "type": "git",
-	  "url": "git@github.com:HiTask/jv2js-translate.git"
+		"type": "git",
+		"url": "git@github.com:HiTask/jv2js-translate.git"
 	},
 	"engines": {
 		"node": ">=8.12"
@@ -14,19 +14,24 @@
 	"license": "UNLICENSED",
 	"bin": {
 		"jv2js-translate": "./bin/jv2js-translate"
-  },
-  "bugs": {
-    "url": "https://github.com/HiTask/jv2js-translate/issues"
+	},
+	"bugs": {
+		"url": "https://github.com/HiTask/jv2js-translate/issues"
 	},
 	"scripts": {
-		"test:cli": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist",
-		"test:node": "rm -rf test/dist && node test/node-api.test.js"
+		"test:cli:nested": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist",
+		"test:cli:flatten": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist --flatten true",
+		"test:node:nested": "rm -rf test/dist && node test/node-api.nested.test.js",
+		"test:node:flatten": "rm -rf test/dist && node test/node-api.flatten.test.js"
 	},
 	"dependencies": {
-	  "colors": "^1.2.1",
-	  "glob": "^7.1.1",
-	  "lodash.merge": "^4.0.0",
-	  "properties-parser": "^0.3.1",
-	  "yargs": "^13.0.0"
+		"colors": "^1.2.1",
+		"glob": "^7.1.1",
+		"lodash.merge": "^4.0.0",
+		"properties-parser": "^0.3.1",
+		"yargs": "^13.0.0"
+	},
+	"devDependencies": {
+		"prettier": "^1.17.0"
 	}
 }
