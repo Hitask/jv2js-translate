@@ -1,0 +1,25 @@
+{
+	"name": "@hitask/jv2js-translate",
+	"version": "1.0.0",
+	"description": "Utility lib to transform java properties to json files",
+	"main": "index.js",
+	"author": "Human Computer LLC",
+	"repository": {
+	  "type": "git",
+	  "url": "git@github.com:HiTask/jv2js-translate.git"
+	},
+	"engines": {
+		"node": ">=8.12"
+	},
+	"license": "UNLICENSED",
+	"bin": {
+		"jv2js-translate": "./bin/jv2js-translate"
+	},
+	"devDependencies": {
+	  "colors": "^1.2.1",
+	  "glob": "^7.1.1",
+	  "lodash.merge": "^4.0.0",
+	  "properties-parser": "^0.3.1",
+	  "yargs": "^13.0.0"
+	}
+}
