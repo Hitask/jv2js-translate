@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const merge = require('lodash.merge');
-const { read } = require('properties-parser');
+const parser = require('properties-parser');
 
 const javaStringToLocaleMessageFormat = string => {
 	let counter = -1;
@@ -14,14 +14,7 @@ const javaStringToLocaleMessageFormat = string => {
 	});
 };
 
-const stringWithDotsProcess = ({
-	initialObj,
-	initialKey,
-	value,
-	keysLeft,
-	objLink,
-	localeName,
-}) => {
+const stringWithDotsProcess = ({ initialObj, initialKey, value, keysLeft, objLink, localeName }) => {
 	const curKey = keysLeft.shift();
 	if (!keysLeft.length) {
 		delete initialObj[initialKey];
@@ -34,25 +27,20 @@ const stringWithDotsProcess = ({
 		return;
 	}
 	objLink[curKey] = objLink[curKey] || {};
-	stringWithDotsProcess({
-		initialObj,
-		initialKey,
-		value,
-		keysLeft,
-		objLink: objLink[curKey],
-		localeName,
-	});
+	stringWithDotsProcess({ initialObj, initialKey, value, keysLeft, objLink: objLink[curKey], localeName });
 };
 
 const parseAccessibleLocales = src => {
 	const ignoreList = ['.DS_Store'];
 	const locales = [];
 	fs.readdirSync(src).forEach(itemName => {
-		if (ignoreList.indexOf(itemName) === -1) {
-			if (fs.statSync(`${src}/${itemName}`).isDirectory()) {
-				locales.push(itemName);
-			}
+		if (ignoreList.includes(itemName)) return;
+		if (fs.statSync(`${src}/${itemName}`).isDirectory()) {
+			locales.push(itemName);
+			return;
 		}
+		const match = itemName.match(/(\w+)\.properties$/);
+		if (match) locales.push(match[1]);
 	});
 	return locales;
 };
@@ -61,39 +49,36 @@ const dots2keys = (obj, localeName) => {
 	Object.keys(obj).forEach(key => {
 		if (key.indexOf('.') === -1) return;
 		const value = javaStringToLocaleMessageFormat(obj[key]);
-		stringWithDotsProcess({
-			initialObj: obj,
-			initialKey: key,
-			value,
-			keysLeft: key.split('.'),
-			objLink: obj,
-			localeName,
-		});
+		stringWithDotsProcess({ initialObj: obj, initialKey: key, value, keysLeft: key.split('.'), objLink: obj, localeName });
 	});
 };
 
-const parseLocaleFromDir = ({ localeName, langDir, flatten }) => {
-	const localeObject = glob
-		.sync('*.properties', { cwd: path.join(langDir, localeName), realpath: true })
-		.reduce((acc, propertiesFilename) => {
-			const namespace = /([^/\\]+).properties$/.exec(propertiesFilename)[1]; // extract filename without extension
-			const objectOfLocalizedMessages = read(propertiesFilename);
-			if (flatten) {
-				Object.keys(objectOfLocalizedMessages).forEach(key => {
-					acc[`${namespace}.${key}`] = objectOfLocalizedMessages[key];
-				});
-			} else {
-				dots2keys(objectOfLocalizedMessages, localeName);
-				acc[namespace] = objectOfLocalizedMessages;
-			}
+const parseLocaleFromPropFile = (localeName, propertiesFilename, { flatten, fileNameAsNamespace } = {}) => {
+	const namespace = /([^/\\]+).properties$/.exec(propertiesFilename)[1]; // extract filename without extension
+	const objectOfLocalizedMessages = parser.read(propertiesFilename);
+	if (flatten) {
+		return Object.keys(objectOfLocalizedMessages).reduce((acc, key) => {
+			acc[`${namespace}.${key}`] = objectOfLocalizedMessages[key];
 			return acc;
 		}, {});
+	}
+	dots2keys(objectOfLocalizedMessages, localeName);
+	if (fileNameAsNamespace) return { [namespace]: objectOfLocalizedMessages };
+	return objectOfLocalizedMessages;
+};
+
+const parseLocaleFromDir = ({ localeName, langDir, flatten }) => {
+	const possibleSingleLocaleFile = path.join(langDir, `${localeName}.properties`);
+	if (fs.existsSync(possibleSingleLocaleFile)) return parseLocaleFromPropFile(localeName, possibleSingleLocaleFile, { flatten });
+	const localeObject = glob.sync('*.properties', { cwd: path.join(langDir, localeName), realpath: true }).reduce((acc, propertiesFilename) => {
+		const localesHash = parseLocaleFromPropFile(localeName, propertiesFilename, { flatten, fileNameAsNamespace: true });
+		return { ...acc, ...localesHash };
+	}, {});
 	return localeObject;
 };
 
 const props2Json = argv => {
 	const { src: langDir, dist: destinationDir, default: defaultLocale, flatten } = argv;
-	// console.log('Start parsing locales props files to Json');
 	const locales = parseAccessibleLocales(langDir);
 	if (!locales.length) return;
 
@@ -106,7 +91,6 @@ const props2Json = argv => {
 
 	// Generated needed locales
 	locales.forEach(localeName => {
-		// console.log(`Start parsing locale: ${localeName}`);
 		const localeObject = parseLocaleFromDir({ localeName, langDir, flatten });
 		const localeObjectWithDefaultsApplied = merge({}, defaultLocaleObj, localeObject);
 		const destFile = path.join(destinationDir, `${localeName}.json`);
