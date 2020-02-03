@@ -30,8 +30,13 @@ yargs
 			flatten: {
 				alias: 'l',
 				default: false,
-				describe: 'translation keys are flatten, joined by "."'
-			}
+				describe: 'translation keys are flatten, joined by "."',
+			},
+			verbose: {
+				alias: 'v',
+				default: false,
+				describe: 'log more details to console',
+			},
 		},
 		argv => {
 			const args = checkRelativePathArgs(argv, ['src', 's', 'dist', 'd']);

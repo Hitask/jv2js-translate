@@ -78,7 +78,7 @@ const parseLocaleFromDir = ({ localeName, langDir, flatten }) => {
 };
 
 const props2Json = argv => {
-	const { src: langDir, dist: destinationDir, default: defaultLocale, flatten } = argv;
+	const { src: langDir, dist: destinationDir, default: defaultLocale, flatten, verbose } = argv;
 	const locales = parseAccessibleLocales(langDir);
 	if (!locales.length) return;
 
@@ -96,7 +96,7 @@ const props2Json = argv => {
 		const destFile = path.join(destinationDir, `${localeName}.json`);
 		const destContent = JSON.stringify(localeObjectWithDefaultsApplied, null, 4);
 		fs.writeFileSync(destFile, destContent, 'utf-8');
-		console.log(`${localeName} locale file was successfully written`.green);
+		if (verbose) console.log(`${localeName} locale file was successfully written`.green);
 	});
 
 	console.info('All the localization files prepared. OK.'.green);
