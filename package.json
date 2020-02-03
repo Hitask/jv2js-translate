@@ -20,6 +20,7 @@
 	},
 	"scripts": {
 		"eslint": "eslint .",
+		"test": "yarn test:cli:nested && yarn test:cli:flatten && yarn test:node:nested && yarn test:node:flatten",
 		"test:cli:nested": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist",
 		"test:cli:flatten": "rm -rf test/dist && ./bin/jv2js-translate compile --src ./test/src --dist ./test/dist --flatten true",
 		"test:node:nested": "rm -rf test/dist && node test/node-api.nested.test.js",
