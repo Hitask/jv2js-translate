@@ -53,9 +53,22 @@ const dots2keys = (obj, localeName) => {
 	});
 };
 
+const checkNamespaceValueConflicts = (hash, prefix) => {
+	return Object.keys(hash).reduce((acc, trace) => {
+		if (acc[trace]) throw new Error(`${prefix}.${trace} cannot have a translation value because it's used as a namespace for other values`);
+		const keys = trace.split('.');
+		keys.forEach((key, idx) => {
+			const subTrace = keys.slice(0, idx + 1).join('.');
+			acc[subTrace] = true;
+		});
+		return acc;
+	}, {});
+};
+
 const parseLocaleFromPropFile = (localeName, propertiesFilename, { flatten, fileNameAsNamespace } = {}) => {
 	const namespace = /([^/\\]+).properties$/.exec(propertiesFilename)[1]; // extract filename without extension
 	const objectOfLocalizedMessages = parser.read(propertiesFilename);
+	checkNamespaceValueConflicts(objectOfLocalizedMessages, localeName === namespace ? namespace : `${localeName}.${namespace}`);
 	if (flatten) {
 		return Object.keys(objectOfLocalizedMessages).reduce((acc, key) => {
 			acc[`${namespace}.${key}`] = objectOfLocalizedMessages[key];
